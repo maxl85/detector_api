@@ -1,11 +1,12 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 
 app = FastAPI(
     title="FastAPI Template",
-    description="YOLOv8n",
+    description="YOLOv8",
     version="1.0",
 )
 
@@ -25,8 +26,11 @@ class RequestModel(BaseModel):
     function_name: str
 
 
-@app.get("/")
-async def main():
-    """ Entry point for the application """
-    return {"message": "Welcome to FastAPI"}
+# redirect
+@app.get("/", include_in_schema=False)
+async def redirect():
+    return RedirectResponse("/docs")
 
+
+
+# добавить метод получения метадаты
