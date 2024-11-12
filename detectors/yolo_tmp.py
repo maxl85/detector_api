@@ -1,34 +1,52 @@
-# from ultralytics import YOLO
+import io
+import base64
+from PIL import Image
+import numpy as np
+from ultralytics import YOLO
 
-# # Load a pretrained YOLO11n model
-# model = YOLO("yolov8n.pt")
-
-# # Run inference
-# results = model.predict("bus.jpg")
-# print(results)
-
-
-
+# Описане детектора
 metadata = {
-    "name": "yolo_v8_model", # убрать и вставлять амя файла при ответе
     "type": "yolo8s",
     "model": "/models/yolo_v8_model.pt",
     "dataset": "/datasets/yolo_v8_model/",
     "version": "1.0",
-    "uploaded_by": "developer1",
-    "comment": "text",
+    # "uploaded_by": "developer1", # Добавлять автоматически. Либо  настроив CI/CD на Gitlab, либо при коммите
+    # "comment": "text",
 }
 
 
-def predict(image):
-    # Пример обработки изображения
-    print("call predict")
-    # return {"detected_objects": ["object1", "object2"], "threshold": threshold}
+def predict(base64_image_str):
+    # Пример для YOLO v8
+    
+    model = YOLO("yolov8n.pt")
+    
+    # Декодируем картинку base64 -> PIL -> np.array
+    img_data = base64.b64decode(base64_image_str)
+    image = Image.open(io.BytesIO(img_data)).convert("RGB")
+    image_np = np.array(image)
+    
+    # Распознаем
+    results = model(image_np)
+    
 
-def train(image, epochs=10):
-    # Пример тренировки
-    return {"status": "training_started", "epochs": epochs}
+    # Вытаскиваем рузельтаты распознавания
+    detections = []
+    for result in results:
+        for box in result.boxes:
+            class_id = int(box.cls[0])
+            detections.append({
+                "class": model.names[class_id],
+            })
+    
+    return detections
+    
+    
+def train(detector_name, dataset_path):
+    # Тут должен быть код на котором тренировали модель
+    
+    result = {"detector_name": detector_name, "dataset_path": dataset_path}
+    return result
 
-def info():
-    # Пример информации о модели
-    return {"description": "This is a YOLO object detector"}
+
+def get_metadata(detector_name):
+    return {'name': detector_name, **metadata}

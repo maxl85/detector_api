@@ -78,20 +78,20 @@ def load_detector(detector_name):
 
 
 class PredictRequestModel(BaseModel):
-    image: str  # base64 encoded image
     detector_name: str
+    image: str  # base64 encoded image
     
-@app.post("/predict")
-async def predict(request: PredictRequestModel):
+@app.post("/run_predict")
+async def run_predict(request: PredictRequestModel):
     """
     Распознать изображение с помощью выбранного детектора
 
     Parameters
     ----------
-    image : str
-        Изображение в формате base64.
     detector_name : str
         Имя детектора.
+    image : str
+        Изображение в формате base64.
 
     Returns
     -------
@@ -127,8 +127,8 @@ class TrainRequestModel(BaseModel):
     detector_name: str
     dataset_path: str
 
-@app.post("/train")
-async def train(request: TrainRequestModel):
+@app.post("/run_train")
+async def run_train(request: TrainRequestModel):
     """
     Запустить функцию обучения выбранного детектора.
 
@@ -163,8 +163,8 @@ async def train(request: TrainRequestModel):
     return JSONResponse(result)
 
 
-@app.get("/list")
-async def list():
+@app.get("/get_list")
+async def get_list():
     """
     Получить список всех доступных детекторов
     
@@ -186,8 +186,8 @@ async def list():
 class MetadataRequestModel(BaseModel):
     detector_name: str
     
-@app.post("/metadata")
-async def metadata(request: MetadataRequestModel):
+@app.post("/get_metadata")
+async def get_metadata(request: MetadataRequestModel):
     """
     Получить метаданные детектора
 
