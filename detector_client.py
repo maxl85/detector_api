@@ -11,16 +11,11 @@ class DetectorClient:
         """
         Распознать изображение с помощью выбранного детектора
 
-        Parameters
-        ----------
-        detector_name : str
-            Имя детектора.
-        image : str
-            Изображение в формате base64.
+        Parameters:        
+            detector_name: str Имя детектора.
+            image: str Изображение в формате base64.
 
-        Returns
-        -------
-        str
+        Returns:
             Ответ детектора в формате JSON.
         """
         
@@ -38,16 +33,11 @@ class DetectorClient:
         """
         Запустить функцию обучения выбранного детектора.
 
-        Parameters
-        ----------
-        detector_name : str
-            Имя детектора.
-        dataset_path : str
-            Пусть к датасету.
+        Parameters:
+            detector_name: str  Имя детектора.
+            dataset_path: str  Пусть к датасету.
 
-        Returns
-        -------
-        str
+        Returns:
             Ответ детектора в формате JSON.
         """
         
@@ -65,9 +55,7 @@ class DetectorClient:
         """
         Получить список всех доступных детекторов
         
-        Returns
-        -------
-        str
+        Returns:
             Список в формате JSON.
         """
         
@@ -82,14 +70,10 @@ class DetectorClient:
         """
         Получить метаданные детектора
 
-        Parameters
-        ----------
-        detector_name : str
-            Имя детектора.
+        Parameters:
+            detector_name: str Имя детектора.
 
-        Returns
-        -------
-        str
+        Returns:
             Метаданные детектора формате JSON.
         """
         
