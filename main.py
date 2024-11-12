@@ -1,7 +1,6 @@
 import os
 import base64
 import traceback
-from traceback import format_exc, print_exc
 import importlib.util
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import RedirectResponse, JSONResponse, PlainTextResponse
@@ -31,13 +30,6 @@ app = FastAPI(
 #     allow_headers=["*"],
 # )
 
-class PredictRequestModel(BaseModel):
-    image: str  # base64 encoded image
-    detector_name: str
-
-class TrainRequestModel(BaseModel):
-    detector_name: str
-    dataset_path: str
 
 
 @app.exception_handler(Exception)
@@ -84,8 +76,28 @@ def load_detector(detector_name):
     
     return detector
 
+
+class PredictRequestModel(BaseModel):
+    image: str  # base64 encoded image
+    detector_name: str
+    
 @app.post("/predict")
 async def predict(request: PredictRequestModel):
+    """
+    Распознать изображение с помощью выбранного детектора
+
+    Parameters
+    ----------
+    image : str
+        Изображение в формате base64.
+    detector_name : str
+        Имя детектора.
+
+    Returns
+    -------
+    str
+        Ответ детектора в формате JSON.
+    """
     function_name = "predict"
     
     detector = load_detector(request.detector_name)
@@ -108,12 +120,103 @@ async def predict(request: PredictRequestModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error while executing detector function: {str(e)}")
 
-    # return result in JSON
-    return JSONResponse(content=result)
+    return JSONResponse(result)
 
 
+class TrainRequestModel(BaseModel):
+    detector_name: str
+    dataset_path: str
+
+@app.post("/train")
+async def train(request: TrainRequestModel):
+    """
+    Запустить функцию обучения выбранного детектора.
+
+    Parameters
+    ----------
+    detector_name : str
+        Имя детектора.
+    dataset_path : str
+        Пусть к датасету.
+
+    Returns
+    -------
+    str
+        Ответ детектора в формате JSON.
+    """
+    
+    function_name = "train"
+    
+    detector = load_detector(request.detector_name)
+
+    if not hasattr(detector, function_name):
+        raise HTTPException(status_code=404, detail="Function not found in detector")
+
+    function = getattr(detector, function_name)
+    
+    # Выполнение функции детектора с переданными параметрами
+    try:
+        result = function(request.detector_name, request.dataset_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error while executing detector function: {str(e)}")
+
+    return JSONResponse(result)
 
 
+@app.get("/list")
+async def list():
+    """
+    Получить список всех доступных детекторов
+    
+    Returns
+    -------
+    str
+        Список в формате JSON.
+    """
+    
+    # Получение списка файлов .py
+    py_files = [f for f in os.listdir(detectors_path) if f.endswith('.py')]
 
-# добавить метод получения метадаты
+    # Удаление расширения из имен файлов
+    detectors = [os.path.splitext(f)[0] for f in py_files]
+
+    return JSONResponse(detectors)
+
+
+class MetadataRequestModel(BaseModel):
+    detector_name: str
+    
+@app.post("/metadata")
+async def metadata(request: MetadataRequestModel):
+    """
+    Получить метаданные детектора
+
+    Parameters
+    ----------
+    detector_name : str
+        Имя детектора.
+
+    Returns
+    -------
+    str
+        Метаданные детектора формате JSON.
+    """
+    function_name = "get_metadata"
+    
+    detector = load_detector(request.detector_name)
+
+    if not hasattr(detector, function_name):
+        raise HTTPException(status_code=404, detail="Function not found in detector")
+
+    function = getattr(detector, function_name)
+    
+    # Выполнение функции детектора с переданными параметрами
+    try:
+        result = function(request.detector_name)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error while executing detector function: {str(e)}")
+
+    return JSONResponse(result)
+
+
 
