@@ -9,7 +9,7 @@ metadata = {
     "type": "yolo8s",
     "model": "/models/yolo_v8_model.pt",
     "dataset": "/datasets/yolo_v8_model/",
-    "version": "1.0",
+    # "version": "1.0",
     # "uploaded_by": "developer1", # Добавлять автоматически. Либо  настроив CI/CD на Gitlab, либо при коммите
     # "comment": "text",
 }
@@ -41,7 +41,7 @@ def predict(base64_image_str):
     return detections
     
     
-def train(detector_name, dataset_path):
+def train(detector_name, dataset_path): # del dataset_path
     # Тут должен быть код на котором тренировали модель
     
     result = {"detector_name": detector_name, "dataset_path": dataset_path}
